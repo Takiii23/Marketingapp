@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketing Generátor 🚀</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        input {
+            padding: 10px;
+            width: 60%;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result-box {
+            background: white;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 18px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            max-width: 80%;
+            text-align: left;
+        }
+        .copy-btn {
+            margin-top: 10px;
+            background-color: #28a745;
+            border: none;
+            padding: 5px 10px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .copy-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+<h1>AI Marketing Generátor 🚀</h1>
+
+<input type="text" id="prompt" placeholder="Adj meg egy témát...">
+<button onclick="generateText()">Generálás</button>
+
+<h2>Eredmények:</h2>
+<div id="result">Itt fog megjelenni a generált szöveg...</div>
+
+<script>
+    async function generateText() {
+        const prompt = document.getElementById('prompt').value;
+        if (!prompt) {
+            alert("Adj meg egy témát!");
+            return;
+        }
+        document.getElementById('result').innerText = "Generálás folyamatban...";
+
+        const response = await fetch('http://localhost:3000/generate-text', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+
+        const data = await response.json();
+
+        if (!data.variations || data.variations.length === 0) {
+            document.getElementById('result').innerText = "Hiba történt!";
+            return;
+        }
+
+        let resultHtml = "";
+        data.variations.forEach(variation => {
+            resultHtml += `
+                    <div class="result-box">
+                        <strong>${variation.type}:</strong>
+                        <p>${variation.text}</p>
+                        <button class="copy-btn" onclick="copyToClipboard('${variation.text}')">📋 Másolás</button>
+                    </div>
+                `;
+        });
+
+        document.getElementById('result').innerHTML = resultHtml;
+    }
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text);
+        alert("Szöveg másolva!");
+    }
+</script>
+</body>
+</html>
